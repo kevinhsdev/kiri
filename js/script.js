@@ -1,5 +1,7 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+const ICON_X='<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
 // ── STORAGE (localStorage) ──
 const Store={
   get(k,fb=null){try{const v=JSON.parse(localStorage.getItem(k)??'null');return v===null?fb:v}catch{return fb}},
@@ -207,10 +209,10 @@ function triggerOcr(){
 async function runOcr(item){
   item.ocrRunning=true;
   noTextTag.classList.add('ocr-running');
-  noTextTag.textContent='rodando OCR...';
+  noTextTag.textContent='Extraindo texto…';
   try{
     const worker=await getOcrWorker();
-    if(!worker){item.ocrRunning=false;noTextTag.classList.remove('ocr-running');noTextTag.textContent='digitalizado · sem texto';return}
+    if(!worker){item.ocrRunning=false;noTextTag.classList.remove('ocr-running');noTextTag.textContent='Digitalizado · sem texto';return}
     if(!item.pdfDoc)item.pdfDoc=await pdfjsLib.getDocument({data:item.buffer.slice(0)}).promise;
     const page=await item.pdfDoc.getPage(1);
     const vp=page.getViewport({scale:2.2,rotation:(page.rotate+item.rot)%360});
@@ -234,7 +236,7 @@ async function runOcr(item){
         }
       }
       checkFolderSuggestion(item);
-      showToast('OCR concluído'+(sugg?' · tipo sugerido ✦':''),false,true);
+      showToast('OCR concluído'+(sugg?' · tipo sugerido':''),false,true);
     }else{
       showToast('OCR não encontrou texto legível neste documento',true);
     }
@@ -244,8 +246,8 @@ async function runOcr(item){
   }
   if(item===files[activeIdx]){
     noTextTag.classList.remove('ocr-running');
-    if(item.ocrDone){noTextTag.classList.add('ocr-done');noTextTag.textContent='digitalizado · OCR ✓'}
-    else noTextTag.textContent='digitalizado · sem texto';
+    if(item.ocrDone){noTextTag.classList.add('ocr-done');noTextTag.textContent='Texto extraído por OCR'}
+    else noTextTag.textContent='Digitalizado · sem texto';
   }
   renderList();updateStats();
 }
@@ -357,13 +359,13 @@ function updateFolderUI(){
     fbName.textContent=dirHandle.name;
     fbHint.textContent='os arquivos serão gravados aqui';
     fbSwap.style.display='';
-    crumbFolder.textContent='~/'+dirHandle.name+'/';
+    crumbFolder.textContent=dirHandle.name+'  /  ';
   }else{
     folderBox.classList.remove('set');
     fbName.textContent=FS_SUPPORTED?'Escolher pasta…':'Sem suporte a pastas';
     fbHint.textContent=FS_SUPPORTED?'salva direto na pasta do aluno':'os arquivos irão para Downloads';
     fbSwap.style.display='none';
-    crumbFolder.textContent='~/';
+    crumbFolder.textContent='';
   }
 }
 (async()=>{
@@ -372,7 +374,7 @@ function updateFolderUI(){
     const h=await IDB.get('dirHandle');
     if(h){
       folderReconnect.style.display='';
-      folderReconnect.textContent='↻ Reconectar pasta anterior: "'+h.name+'"';
+      folderReconnect.textContent='Reconectar pasta anterior: “'+h.name+'”';
     }
   }
   updateFolderUI();
@@ -462,7 +464,7 @@ function renderChips(){
     btn.dataset.type=t.n;
     const lbl=document.createElement('span');lbl.textContent=t.n;btn.appendChild(lbl);
     if(t.custom){
-      const x=document.createElement('button');x.className='chip-x';x.textContent='✕';
+      const x=document.createElement('button');x.className='chip-x';x.innerHTML=ICON_X;x.setAttribute('aria-label','Remover tipo');
       x.onclick=e=>{
         e.stopPropagation();
         customChips=customChips.filter(c=>c.n!==t.n);Store.set('pdf_chips_v2',customChips);
@@ -526,16 +528,16 @@ function renderDictModal(){
     customKws.forEach(([k])=>{
       const chip=document.createElement('span');chip.className='dict-kw custom';
       const lbl=document.createElement('span');lbl.textContent=k;chip.appendChild(lbl);
-      const x=document.createElement('button');x.textContent='✕';
+      const x=document.createElement('button');x.innerHTML=ICON_X;x.setAttribute('aria-label','Remover palavra-chave');
       x.onclick=()=>{removeDictKeyword(type,k);renderDictModal()};
       chip.appendChild(x);kwsRow.appendChild(chip);
     });
     if(!baseKws.length&&!customKws.length){
-      const empty=document.createElement('span');empty.className='dict-kw base';empty.textContent='// nenhuma palavra-chave ainda';
+      const empty=document.createElement('span');empty.className='dict-kw base';empty.textContent='Nenhuma palavra-chave ainda';
       kwsRow.appendChild(empty);
     }
     const addRow=document.createElement('div');addRow.className='dict-add';
-    const input=document.createElement('input');input.placeholder='nova palavra ou frase...';input.maxLength=60;
+    const input=document.createElement('input');input.placeholder='Nova palavra ou frase';input.maxLength=60;
     const btn=document.createElement('button');btn.textContent='Adicionar';
     const doAdd=()=>{
       if(!input.value.trim())return;
@@ -614,7 +616,7 @@ async function addFiles(newFiles){
   }
   if(loaded>0){
     const nSugg=files.filter(f=>!f.saved&&f.suggestion).length;
-    showToast(loaded+' arquivo'+(loaded>1?'s':'')+' carregado'+(loaded>1?'s':'')+(nSugg?' · '+nSugg+' classificado'+(nSugg>1?'s':'')+' ✦':''),false,nSugg>0);
+    showToast(loaded+' arquivo'+(loaded>1?'s':'')+' carregado'+(loaded>1?'s':'')+(nSugg?' · '+nSugg+' classificado'+(nSugg>1?'s':''):''),false,nSugg>0);
   }
   renderList();updateStats();
   if(activeIdx===-1&&files.length>0)selectFile(0);
@@ -630,13 +632,13 @@ function renderList(){
     (item.suggestion&&item.suggestion.type.toLowerCase().includes(q))
   );
   if(!files.length){
-    fileListEl.innerHTML='<div class="file-empty">// nenhum arquivo<br>// carregado ainda</div>';
+    fileListEl.innerHTML='<div class="file-empty">Nenhum arquivo carregado</div>';
     document.getElementById('h-badge').textContent='0 arquivos';
     emptyState.style.display='flex';viewerWrap.classList.remove('visible');return;
   }
   if(!filtered.length){
     const d=document.createElement('div');d.className='file-empty';
-    d.textContent='// nenhum resultado para "'+q+'"';
+    d.textContent='Nenhum resultado para “'+q+'”';
     fileListEl.appendChild(d);
   }
   filtered.forEach(({item,i})=>{
@@ -650,10 +652,10 @@ function renderList(){
     const nn=document.createElement('div');
     if(item.saved){nn.className='fi-new';nn.textContent=item.savedAs+'.pdf'}
     else if(item.suggestion){nn.className='fi-new sugg';nn.textContent=item.suggestion.type}
-    else{nn.className='fi-new empty';nn.textContent=item.hasText?'// sem nome ainda':'// digitalizado · manual'}
+    else{nn.className='fi-new empty';nn.textContent=item.hasText?'Sem nome ainda':'Digitalizado · nomear manualmente'}
     info.appendChild(orig);info.appendChild(nn);
     const x=document.createElement('button');
-    x.className='fi-x';x.textContent='✕';x.title='Remover da fila';
+    x.className='fi-x';x.innerHTML=ICON_X;x.title='Remover da fila';
     x.onclick=e=>{e.stopPropagation();removeFile(i)};
     el.appendChild(dot);el.appendChild(info);el.appendChild(x);
     fileListEl.appendChild(el);
@@ -695,9 +697,9 @@ async function selectFile(i){
   noTextTag.classList.toggle('show',!item.hasText);
   noTextTag.classList.remove('ocr-running','ocr-done');
   if(!item.hasText){
-    if(item.ocrDone){noTextTag.classList.add('ocr-done');noTextTag.textContent='digitalizado · OCR ✓'}
-    else if(item.ocrRunning){noTextTag.classList.add('ocr-running');noTextTag.textContent='rodando OCR...'}
-    else noTextTag.textContent='digitalizado · clique p/ OCR';
+    if(item.ocrDone){noTextTag.classList.add('ocr-done');noTextTag.textContent='Texto extraído por OCR'}
+    else if(item.ocrRunning){noTextTag.classList.add('ocr-running');noTextTag.textContent='Extraindo texto…'}
+    else noTextTag.textContent='Digitalizado · extrair texto';
   }
 
   // aplica sugestão automática (ou nome já salvo)
@@ -913,14 +915,14 @@ function updateStats(){
   progressBar.style.width=pct+'%';
   const pendingWithSugg=files.filter(f=>!f.saved&&f.suggestion).length;
   btnBatch.disabled=pendingWithSugg===0;
-  btnBatch.textContent=pendingWithSugg>0?'⚡ Aplicar '+pendingWithSugg+' sugest'+(pendingWithSugg>1?'ões':'ão')+' em lote':'⚡ Aplicar sugestões em lote';
+  btnBatch.textContent=pendingWithSugg>0?'Aplicar '+pendingWithSugg+' sugest'+(pendingWithSugg>1?'ões':'ão')+' em lote':'Aplicar sugestões em lote';
 }
 
 // ── CONCLUÍDO ──
 function showDone(){
   const total=files.length;
   viewerWrap.classList.remove('visible');
-  document.getElementById('done-sub').textContent='// '+total+' arquivo'+(total>1?'s':'')+' renomeado'+(total>1?'s':'')+(dirHandle?' em "'+dirHandle.name+'"':'');
+  document.getElementById('done-sub').textContent=total+' arquivo'+(total>1?'s':'')+' renomeado'+(total>1?'s':'')+(dirHandle?' em "'+dirHandle.name+'"':'');
   const log=document.getElementById('done-log');
   log.innerHTML='';
   sessionLog.forEach(e=>{
@@ -966,6 +968,13 @@ function closeClear(){document.getElementById('overlay').classList.remove('show'
 function clearAll(){
   resetForNew();
   closeClear();
+}
+
+// ── TEMA ──
+function toggleTheme(){
+  const d=document.documentElement;
+  const dark=d.dataset.theme?d.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  d.dataset.theme=dark?'light':'dark';Store.set('pdf_theme',d.dataset.theme);
 }
 
 // ── ATALHOS ──

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="114" fill="#0a0a10"/>
+  <svg x="104" y="104" width="304" height="304" viewBox="221 231 282 283">
+  <defs>
+    <linearGradient id="lg-top" gradientUnits="userSpaceOnUse" x1="316" y1="316" x2="500" y2="238">
+      <stop offset="0" stop-color="#2d4ff6"/>
+      <stop offset="1" stop-color="#b3c1f6"/>
+    </linearGradient>
+    <linearGradient id="lg-fold" gradientUnits="userSpaceOnUse" x1="236" y1="316" x2="309" y2="252">
+      <stop offset="0" stop-color="#2440f5"/>
+      <stop offset="1" stop-color="#3b59f7"/>
+    </linearGradient>
+    <linearGradient id="lg-left" gradientUnits="userSpaceOnUse" x1="309" y1="317" x2="226" y2="491">
+      <stop offset="0" stop-color="#6683f6"/>
+      <stop offset="1" stop-color="#bccbfb"/>
+    </linearGradient>
+    <linearGradient id="lg-bot" gradientUnits="userSpaceOnUse" x1="300" y1="0" x2="500" y2="0">
+      <stop offset="0" stop-color="#2038ee"/>
+      <stop offset=".55" stop-color="#243ef5"/>
+      <stop offset=".63" stop-color="#3d5bf6"/>
+      <stop offset=".74" stop-color="#3553f7"/>
+      <stop offset=".9" stop-color="#2843f4"/>
+      <stop offset="1" stop-color="#2039ee"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#lg-bot)" d="M243 509 L316 436 Q326 426 342 426 L419 426 L419 422 L494 422 L414 502 Q407 509 397 509 Z"/>
+  <path fill="url(#lg-top)" d="M309 241 L312 238 Q314 236 330 236 L474 236 Q498 236 498 260 L498 402 Q498 426 474 426 L419 426 L419 341 Q419 317 395 317 L307 317 L307 243 Z"/>
+  <path fill="url(#lg-fold)" d="M226 324 L310 240 L310 321 L226 321 Z"/>
+  <path fill="url(#lg-left)" d="M226 329 Q226 317 238 317 L309 317 L309 390 Q309 406 298 419 L226 491 Z"/>
+</svg>
+</svg>

@@ -3,32 +3,46 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>PDF Renamer v2 — Instituto Luterano</title>
-<link rel="icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Crect x='1' y='1' width='24' height='24' fill='none' stroke='%231a5cd4' stroke-width='2'/%3E%3Cpath d='M4.5 4.5H21.5V13.85L13.85 21.5H4.5Z' fill='%234d9fff'/%3E%3C/svg%3E"/>
+<meta name="color-scheme" content="light dark"/>
+<title>Kiri - Organizador de Prontuários</title>
+<link rel="icon" type="image/svg+xml" href="assets/icon.svg"/>
+<script>try{const t=JSON.parse(localStorage.getItem('pdf_theme'));if(t)document.documentElement.dataset.theme=t}catch{}</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@600&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
 
 <!-- HEADER -->
 <header>
-  <div class="logo"></div>
-  <div class="h-title">
-    <h1>PDF Renamer</h1>
-    <span class="h-sep">/</span>
-    <span class="h-sub">prontuários</span>
-    <span class="h-ver">v2.0</span>
+  <div class="app-id">
+    <img class="logo" src="assets/icon.svg" alt="" width="28" height="28"/>
+    <h1>Kiri</h1>
+    <span class="h-sub">Prontuários</span>
   </div>
   <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
   <div class="h-right">
     <div class="h-badge" id="h-badge">0 arquivos</div>
-    <button class="h-btn-kb" onclick="openTutorial()" title="Ajuda / tutorial">? Ajuda</button>
-    <button class="h-btn-kb" onclick="toggleKb()" title="Atalhos de teclado">⌨</button>
-    <button class="h-btn" onclick="confirmClear()">⌫ Limpar</button>
+    <div class="h-tools">
+      <button class="icon-btn" onclick="openTutorial()" title="Guia rápido" aria-label="Guia rápido">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a2.9 2.9 0 0 1 5.6 1c0 2-2.8 2.4-2.8 4.3"/><path d="M12 17.6h.01"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleKb()" title="Atalhos de teclado (?)" aria-label="Atalhos de teclado">
+        <svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M7 10h.01M10.5 10h.01M14 10h.01M17 10h.01M8 14h8"/></svg>
+      </button>
+      <button class="icon-btn" id="theme-btn" onclick="toggleTheme()" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+        <svg class="i i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></svg>
+        <svg class="i i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>
+      </button>
+    </div>
+    <span class="h-div" aria-hidden="true"></span>
+    <button class="h-btn" onclick="confirmClear()">
+      <svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+      Limpar
+    </button>
   </div>
 </header>
 
@@ -36,85 +50,99 @@
 <aside>
   <div class="s-sec">
     <div class="s-lbl">Setor</div>
-    <div class="profile-row" id="profile-row">
+    <div class="profile-row" id="profile-row" role="group" aria-label="Setor">
       <button class="profile-chip" data-profile="secretaria" onclick="setProfile('secretaria')">Secretaria</button>
       <button class="profile-chip" data-profile="financeiro" onclick="setProfile('financeiro')">Financeiro</button>
     </div>
   </div>
   <div class="s-sec">
     <div class="s-lbl">Pasta de destino</div>
-    <div class="folder-box" id="folder-box" onclick="pickFolder()">
-      <span class="fb-icon">▣</span>
+    <div class="folder-box" id="folder-box" onclick="pickFolder()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+      <span class="fb-icon"><svg class="i" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5Z"/></svg></span>
       <div class="fb-info">
         <div class="fb-name" id="fb-name">Escolher pasta…</div>
         <div class="fb-hint" id="fb-hint">salva direto na pasta do aluno</div>
       </div>
-      <button class="fb-swap" id="fb-swap" style="display:none" onclick="event.stopPropagation();pickFolder()">trocar</button>
+      <button class="fb-swap" id="fb-swap" style="display:none" onclick="event.stopPropagation();pickFolder()">Trocar</button>
     </div>
     <button class="folder-reconnect" id="folder-reconnect" style="display:none" onclick="reconnectFolder()"></button>
     <div class="folder-sugg" id="folder-sugg">
-      📁 Pasta sugerida: <b id="folder-sugg-name">—</b>
+      <span class="fs-txt">Pasta sugerida: <b id="folder-sugg-name">—</b></span>
       <button onclick="useSuggestedFolder()">Usar</button>
     </div>
   </div>
   <div class="s-sec">
     <div class="s-lbl">Importar</div>
-    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
-      <span class="dz-icon">📄</span>
-      <p><strong>Clique ou arraste</strong><br>para adicionar PDFs</p>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+      <span class="dz-icon"><svg class="i" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M12 17.5v-6M9.5 14 12 11.5l2.5 2.5"/></svg></span>
+      <p><strong>Escolher PDFs</strong> ou arraste aqui</p>
     </div>
     <input type="file" id="file-input" accept="application/pdf,.pdf" multiple/>
     <div class="stats">
       <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Total</div></div>
       <div class="stat"><div class="stat-n g" id="s-done">0</div><div class="stat-l">Salvos</div></div>
-      <div class="stat"><div class="stat-n p" id="s-pend">0</div><div class="stat-l">Fila</div></div>
+      <div class="stat"><div class="stat-n p" id="s-pend">0</div><div class="stat-l">Na fila</div></div>
     </div>
-    <button class="btn-batch" id="btn-batch" onclick="applyAllSuggestions()" disabled>⚡ Aplicar sugestões em lote</button>
+    <button class="btn-batch" id="btn-batch" onclick="applyAllSuggestions()" disabled>Aplicar sugestões em lote</button>
   </div>
-  <div class="s-sec" style="gap:8px">
+  <div class="s-sec s-files">
     <div class="s-lbl">Arquivos</div>
     <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input class="search-input" id="search-input" type="text" placeholder="Filtrar arquivos..." autocomplete="off"/>
+      <svg class="i search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></svg>
+      <input class="search-input" id="search-input" type="search" placeholder="Filtrar arquivos" autocomplete="off"/>
     </div>
   </div>
   <div class="file-list" id="file-list">
-    <div class="file-empty">// nenhum arquivo<br>// carregado ainda</div>
+    <div class="file-empty">Nenhum arquivo carregado</div>
   </div>
 </aside>
 
 <!-- MAIN -->
 <main>
   <div class="empty-state" id="empty-state">
-    <div class="empty-grid" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span><span></span>
+    <div class="empty-art" aria-hidden="true">
+      <span class="ea-sheet ea-back"></span>
+      <span class="ea-sheet ea-front">
+        <svg viewBox="0 0 24 24"><path d="M14 3v5h5"/><path d="M8 12h8M8 15.5h8M8 19h5"/></svg>
+      </span>
     </div>
-    <div class="empty-msg">
-      // adicione PDFs na barra lateral<br>
-      // a classificação <span class="em-acc">automática</span> sugere o tipo de cada um
-    </div>
+    <h2 class="empty-title">Nenhum documento aberto</h2>
+    <p class="empty-msg">Adicione PDFs pela barra lateral. A classificação automática sugere o tipo de cada documento.</p>
+    <button class="btn-primary" onclick="document.getElementById('file-input').click()">Escolher PDFs</button>
   </div>
 
   <div class="viewer-wrap" id="viewer-wrap">
     <div class="viewer-bar">
-      <div class="file-crumb"><span class="crumb-sep" id="crumb-folder">~/</span><span id="file-title">—</span></div>
-      <button class="nav-btn" id="btn-prev" onclick="changePage(-1)">← prev</button>
-      <span class="pg-info" id="pg-info">1 / 1</span>
-      <button class="nav-btn" id="btn-next" onclick="changePage(1)">next →</button>
-      <div class="zoom-wrap">
-        <button class="zoom-btn" onclick="changeZoom(-1)" title="Diminuir zoom">−</button>
+      <div class="file-crumb"><span class="crumb-sep" id="crumb-folder"></span><span id="file-title">—</span></div>
+      <div class="tb-group">
+        <button class="nav-btn" id="btn-prev" onclick="changePage(-1)" title="Página anterior (←)" aria-label="Página anterior">
+          <svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <span class="pg-info" id="pg-info">1 / 1</span>
+        <button class="nav-btn" id="btn-next" onclick="changePage(1)" title="Próxima página (→)" aria-label="Próxima página">
+          <svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+      <div class="tb-group zoom-wrap">
+        <button class="zoom-btn" onclick="changeZoom(-1)" title="Diminuir zoom (−)" aria-label="Diminuir zoom">
+          <svg class="i" viewBox="0 0 24 24"><path d="M6 12h12"/></svg>
+        </button>
         <span class="zoom-val" id="zoom-val">100%</span>
-        <button class="zoom-btn" onclick="changeZoom(1)" title="Aumentar zoom">+</button>
-        <button class="zoom-btn" onclick="rotatePage()" title="Girar 90° (R)">⟳</button>
+        <button class="zoom-btn" onclick="changeZoom(1)" title="Aumentar zoom (+)" aria-label="Aumentar zoom">
+          <svg class="i" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg>
+        </button>
+        <span class="tb-div" aria-hidden="true"></span>
+        <button class="zoom-btn" onclick="rotatePage()" title="Girar 90° (R)" aria-label="Girar página">
+          <svg class="i" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.5"/><path d="M20 3.5v5h-5"/></svg>
+        </button>
       </div>
     </div>
 
     <div class="canvas-area" id="canvas-area">
       <div class="notext-tag" id="notext-tag" onclick="triggerOcr()">digitalizado · sem texto</div>
       <div id="loading-wrap">
-        <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
-        <div class="loading-txt">// carregando documento...</div>
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="loading-txt">Carregando documento…</div>
       </div>
       <canvas id="pdf-canvas"></canvas>
     </div>
@@ -122,54 +150,83 @@
     <div class="rename-bar">
       <div class="chips-head">
         <span class="chips-lbl">Tipo de documento</span>
-        <div class="auto-pill" id="auto-pill">✦ sugerido automaticamente</div>
-        <button class="dict-btn" onclick="openDict()" title="Editar dicionário de palavras-chave">⚙</button>
+        <div class="auto-pill" id="auto-pill">
+          <svg class="i" viewBox="0 0 24 24"><path d="M12 3.5 13.9 9l5.6 1.9-5.6 1.9L12 18.5l-1.9-5.7L4.5 10.9 10.1 9Z"/></svg>
+          Sugerido automaticamente
+        </div>
+        <button class="dict-btn" onclick="openDict()" title="Editar dicionário de palavras-chave">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>
+          Palavras-chave
+        </button>
       </div>
       <div class="chips-row" id="chips-row">
-        <button class="btn-new-chip" id="btn-new-chip" onclick="showChipForm()">+ novo</button>
+        <button class="btn-new-chip" id="btn-new-chip" onclick="showChipForm()">
+          <svg class="i" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg>Novo tipo
+        </button>
         <span class="chip-form" id="chip-form">
-          <input class="chip-fi" id="chip-fi" placeholder="NOME DO TIPO..." maxlength="60"/>
-          <button class="chip-ok" onclick="confirmChip()">Add</button>
-          <button class="chip-cancel" onclick="hideChipForm()">✕</button>
+          <input class="chip-fi" id="chip-fi" placeholder="Nome do tipo" maxlength="60"/>
+          <button class="chip-ok" onclick="confirmChip()">Adicionar</button>
+          <button class="chip-cancel" onclick="hideChipForm()" aria-label="Cancelar">
+            <svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
         </span>
       </div>
       <div class="rename-row">
-        <input class="rename-input" type="text" id="new-name" placeholder="Clique num tipo ou digite o nome..."/>
-        <div class="year-ctl">
-          <button class="year-tgl" id="year-tgl" onclick="toggleYear()" title="Incluir ano no nome">
-            <span class="yt-box"></span><span id="year-val">2026</span>
-          </button>
-          <button class="year-step" onclick="stepYear(-1)" title="Ano anterior">‹</button>
-          <button class="year-step" onclick="stepYear(1)" title="Próximo ano">›</button>
+        <div class="name-field">
+          <input class="rename-input" type="text" id="new-name" placeholder="Escolha um tipo ou digite o nome" spellcheck="false"/>
+          <div class="year-ctl">
+            <button class="year-tgl" id="year-tgl" onclick="toggleYear()" title="Incluir ano no nome">
+              <span class="yt-box"></span><span id="year-val">2026</span>
+            </button>
+            <button class="year-step" onclick="stepYear(-1)" title="Ano anterior" aria-label="Ano anterior">
+              <svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="year-step" onclick="stepYear(1)" title="Próximo ano" aria-label="Próximo ano">
+              <svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+          <span class="suffix">.pdf</span>
         </div>
-        <span class="suffix">.pdf</span>
         <button class="btn-save" onclick="saveFile()">Salvar</button>
-        <button class="btn-nxt" id="btn-nxt" onclick="goNext()" style="display:none">próximo →</button>
+        <button class="btn-nxt" id="btn-nxt" onclick="goNext()" style="display:none">
+          Próximo<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
       </div>
       <div class="bar-foot">
-        <span class="hint"><kbd>Enter</kbd> salvar &nbsp;<kbd>Tab</kbd> próximo &nbsp;<kbd>R</kbd> girar &nbsp;<kbd>+</kbd><kbd>−</kbd> zoom &nbsp;<kbd>←</kbd><kbd>→</kbd> página &nbsp;<kbd>Ctrl</kbd><kbd>↑↓</kbd> arquivo</span>
-        <div class="saved-pill" id="saved-pill">✓ Salvo</div>
+        <span class="hint"><span><kbd>Enter</kbd> salvar</span><span><kbd>Tab</kbd> próximo</span><span><kbd>R</kbd> girar</span><span><kbd>+</kbd><kbd>−</kbd> zoom</span><span><kbd>←</kbd><kbd>→</kbd> página</span><span><kbd>Ctrl</kbd><kbd>↑</kbd><kbd>↓</kbd> arquivo</span></span>
+        <div class="saved-pill" id="saved-pill">
+          <svg class="i" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg>Salvo
+        </div>
       </div>
     </div>
   </div>
 
   <!-- DONE STATE -->
   <div class="done-state" id="done-state">
-    <div class="done-ring"><span class="done-check">✓</span></div>
-    <div class="done-title">Concluído!</div>
-    <div class="done-sub" id="done-sub">// todos os arquivos foram renomeados</div>
+    <svg class="done-mark" viewBox="0 0 64 64" aria-hidden="true">
+      <circle class="dm-ring" cx="32" cy="32" r="29"/>
+      <path class="dm-check" d="m20 33 8 8 16-17"/>
+    </svg>
+    <h2 class="done-title">Tudo pronto</h2>
+    <div class="done-sub" id="done-sub">Todos os arquivos foram renomeados</div>
     <div class="done-log" id="done-log"></div>
     <div class="done-btns">
-      <button class="btn-done ghost" onclick="exportLog()">↓ Baixar log (CSV)</button>
-      <button class="btn-done" onclick="resetForNew()">+ Iniciar novo lote</button>
+      <button class="btn-done ghost" onclick="exportLog()">
+        <svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Baixar log (CSV)
+      </button>
+      <button class="btn-done" onclick="resetForNew()">
+        <svg class="i" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg>Iniciar novo lote
+      </button>
     </div>
   </div>
 </main>
 
 <!-- SHORTCUTS PANEL -->
 <div class="kb-overlay" id="kb-overlay" onclick="toggleKb()">
-  <div class="kb-panel" onclick="event.stopPropagation()">
-    <button class="kb-close" onclick="toggleKb()">✕</button>
+  <div class="kb-panel" onclick="event.stopPropagation()" role="dialog" aria-label="Atalhos de teclado">
+    <button class="kb-close" onclick="toggleKb()" aria-label="Fechar">
+      <svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
     <h2>Atalhos de teclado</h2>
     <div class="kb-row"><span class="kb-desc">Salvar e avançar</span><div class="kb-keys"><kbd>Enter</kbd></div></div>
     <div class="kb-row"><span class="kb-desc">Próximo arquivo</span><div class="kb-keys"><kbd>Tab</kbd></div></div>
@@ -184,46 +241,46 @@
 
 <!-- CONFIRM CLEAR -->
 <div class="overlay" id="overlay">
-  <div class="dialog">
-    <h2>Limpar lista</h2>
-    <p>Todos os PDFs serão removidos da fila.<br>Arquivos já salvos não serão afetados.</p>
+  <div class="dialog" role="alertdialog" aria-labelledby="clr-title">
+    <h2 id="clr-title">Limpar a lista?</h2>
+    <p>Todos os PDFs serão removidos da fila. Arquivos já salvos não serão afetados.</p>
     <div class="dialog-btns">
       <button class="btn-cancel" onclick="closeClear()">Cancelar</button>
-      <button class="btn-danger" onclick="clearAll()">Limpar</button>
+      <button class="btn-danger" onclick="clearAll()">Limpar lista</button>
     </div>
   </div>
 </div>
 
 <!-- DUPLICATE DIALOG -->
 <div class="overlay" id="dup-overlay">
-  <div class="dialog warn">
-    <h2>Arquivo já existe</h2>
+  <div class="dialog warn" role="alertdialog" aria-labelledby="dup-title">
+    <h2 id="dup-title">Arquivo já existe</h2>
     <p id="dup-msg">Já existe um arquivo com este nome na pasta.</p>
     <div class="dialog-btns">
       <button class="btn-cancel" onclick="resolveDup('cancel')">Cancelar</button>
-      <button class="btn-ok" onclick="resolveDup('increment')" id="dup-inc">Salvar como (2)</button>
       <button class="btn-warn" onclick="resolveDup('replace')">Substituir</button>
+      <button class="btn-ok" onclick="resolveDup('increment')" id="dup-inc">Salvar como (2)</button>
     </div>
   </div>
 </div>
 
 <!-- TUTORIAL / BOAS-VINDAS -->
 <div class="overlay" id="tut-overlay">
-  <div class="tut-panel" onclick="event.stopPropagation()">
+  <div class="tut-panel" onclick="event.stopPropagation()" role="dialog" aria-labelledby="tut-title">
     <div class="tut-head">
-      <h2>PDF Renamer · Guia rápido</h2>
-      <p>// ferramenta interna do OASE — Instituto Educacional Luterano<br>// objetivo: renomear e organizar PDFs de prontuários de forma padronizada e rápida</p>
+      <h2 id="tut-title">Bem-vindo ao Kiri</h2>
+      <p>Guia rápido. Ferramenta interna do OASE — Instituto Educacional Luterano. Renomeie e organize PDFs de prontuários de forma padronizada e rápida.</p>
     </div>
-    <div class="tut-body">
-      <div class="tut-step"><div class="tut-n">1</div><div class="tut-txt"><b>Escolha a pasta de destino</b> — clique em "Escolher pasta…" na barra lateral. Os arquivos renomeados são gravados direto ali, sem precisar baixar e mover manualmente. <span>(funciona no Chrome/Edge; outros navegadores caem no download tradicional)</span></div></div>
-      <div class="tut-step"><div class="tut-n">2</div><div class="tut-txt"><b>Arraste os PDFs</b> para a área de importar, ou clique para selecionar. O sistema já lê o texto de cada um e <b>sugere automaticamente</b> o tipo de documento.</div></div>
-      <div class="tut-step"><div class="tut-n">3</div><div class="tut-txt">Para documentos <b>digitalizados</b> (sem texto, ex: escaneados), clique na etiqueta laranja "digitalizado · sem texto" sobre a página para rodar o <b>OCR</b> e extrair o texto da imagem.</div></div>
-      <div class="tut-step"><div class="tut-n">4</div><div class="tut-txt">Confira ou clique no <b>tipo de documento</b> (chips), ajuste o ano se necessário, e clique em <b>Salvar</b> — ou use <b>Enter</b>. Se o nome do aluno for reconhecido no texto, o sistema sugere a subpasta correspondente.</div></div>
-      <div class="tut-step"><div class="tut-n">5</div><div class="tut-txt">Quando vários arquivos já tiverem sugestão, use <b>"⚡ Aplicar sugestões em lote"</b> na barra lateral para salvar todos de uma vez.</div></div>
-      <div class="tut-step"><div class="tut-n">6</div><div class="tut-txt">Escolha o <b>setor</b> (Secretaria ou Financeiro) no topo da barra lateral para ver só os tipos de documento relevantes ao seu trabalho. Use o ⚙ ao lado de "Tipo de documento" para editar as palavras-chave que a classificação automática usa.</div></div>
-    </div>
+    <ol class="tut-body">
+      <li class="tut-step"><div class="tut-n">1</div><div class="tut-txt"><b>Escolha a pasta de destino</b> em “Escolher pasta…” na barra lateral. Os arquivos renomeados são gravados direto ali, sem baixar e mover manualmente. <span>Funciona no Chrome e no Edge; nos outros navegadores, o arquivo vai para Downloads.</span></div></li>
+      <li class="tut-step"><div class="tut-n">2</div><div class="tut-txt"><b>Arraste os PDFs</b> para a área de importar, ou clique para selecionar. O sistema lê o texto de cada um e <b>sugere o tipo de documento</b>.</div></li>
+      <li class="tut-step"><div class="tut-n">3</div><div class="tut-txt">Em documentos <b>digitalizados</b> (escaneados, sem texto), clique na etiqueta laranja sobre a página para rodar o <b>OCR</b> e extrair o texto da imagem.</div></li>
+      <li class="tut-step"><div class="tut-n">4</div><div class="tut-txt">Confira o <b>tipo de documento</b>, ajuste o ano se necessário e clique em <b>Salvar</b>, ou pressione <b>Enter</b>. Se o nome do aluno for reconhecido, o sistema sugere a subpasta correspondente.</div></li>
+      <li class="tut-step"><div class="tut-n">5</div><div class="tut-txt">Quando vários arquivos já tiverem sugestão, use <b>Aplicar sugestões em lote</b> na barra lateral para salvar todos de uma vez.</div></li>
+      <li class="tut-step"><div class="tut-n">6</div><div class="tut-txt">Escolha o <b>setor</b> (Secretaria ou Financeiro) para ver só os tipos relevantes. Em <b>Palavras-chave</b>, ao lado de “Tipo de documento”, edite os termos que a classificação automática usa.</div></li>
+    </ol>
     <div class="tut-foot">
-      <label class="tut-check"><input type="checkbox" id="tut-dont-show" checked/> Não mostrar isso de novo ao abrir</label>
+      <label class="tut-check"><input type="checkbox" id="tut-dont-show" checked/> Não mostrar ao abrir</label>
       <button class="btn-ok" onclick="closeTutorial()">Entendi</button>
     </div>
   </div>
@@ -231,16 +288,16 @@
 
 <!-- DICIONÁRIO DE PALAVRAS-CHAVE -->
 <div class="overlay" id="dict-overlay">
-  <div class="dict-panel" onclick="event.stopPropagation()">
-    <h2>Dicionário de palavras-chave</h2>
-    <div class="dict-intro">// palavras/frases que o sistema procura no texto do PDF para sugerir o tipo automaticamente.<br>// as palavras em cinza são padrão do sistema; as verdes foram adicionadas por vocês e podem ser removidas.</div>
+  <div class="dict-panel" onclick="event.stopPropagation()" role="dialog" aria-labelledby="dict-title">
+    <h2 id="dict-title">Palavras-chave</h2>
+    <div class="dict-intro">Termos que o sistema procura no texto do PDF para sugerir o tipo. Os termos em cinza são padrão; os <span class="di-custom">verdes</span> foram adicionados pela equipe e podem ser removidos.</div>
     <div id="dict-list"></div>
-    <div class="dict-close-wrap"><button class="btn-cancel" onclick="closeDict()">Fechar</button></div>
+    <div class="dict-close-wrap"><button class="btn-ok" onclick="closeDict()">Concluído</button></div>
   </div>
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="js/script.js"></script>
 </body>

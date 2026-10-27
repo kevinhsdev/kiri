@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=200&color=gradient&customColorList=6,11,20&text=PDF%20Renamer%20v2&fontColor=fff&fontSize=38&fontAlignY=35&desc=Sistema%20interno%20para%20organiza%C3%A7%C3%A3o%20de%20prontu%C3%A1rios%20digitais&descAlignY=55&descSize=16"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&height=200&color=gradient&customColorList=6,11,20&text=Kiri&fontColor=fff&fontSize=38&fontAlignY=35&desc=Sistema%20interno%20para%20organiza%C3%A7%C3%A3o%20de%20prontu%C3%A1rios%20digitais&descAlignY=55&descSize=16"/>
 
 <br>
 
@@ -21,7 +21,7 @@
 
 # 📌 Sobre o projeto
 
-O **PDF Renamer v2** é uma aplicação web desenvolvida para otimizar o processo interno de organização dos prontuários digitais dos alunos.
+O **Kiri** (antigo PDF Renamer v2) é uma aplicação web desenvolvida para otimizar o processo interno de organização dos prontuários digitais dos alunos.
 
 Antes do sistema, cada documento precisava ser aberto, analisado, renomeado manualmente e salvo na pasta correta. Esse processo consumia bastante tempo durante matrículas e atualizações cadastrais.
 
@@ -54,7 +54,7 @@ Além da produtividade, o objetivo foi reduzir erros humanos e padronizar a estr
 ## Demonstração
 
 ```console
-┌─ PDF Renamer v2 ──────────────────────────────── 12 arquivos ──┐
+┌─ Kiri ────────────────────────────────────────── 12 arquivos ──┐
 │                                                                │
 │  ▣ Pasta de destino: 2026_JOAO_SILVA        [trocar]           │
 │                                                                │
@@ -151,7 +151,8 @@ renamer/
 │   ├── js/
 │   │   └── app.js          # classificador, File System Access, viewer
 │   └── img/
-│       └── logo.png        # logo / favicon
+│       ├── logo.svg        # logo (marca)
+│       └── icon.svg        # ícone do app / favicon
 └── README.md
 ```
 
